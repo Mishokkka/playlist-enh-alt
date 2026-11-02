@@ -38,6 +38,10 @@ function bindCancellation(sound, cancel) {
 export function installAudioScheduler() {
     if (Number(game.release?.generation) !== 13) return;
     if (game.settings.get("playlistenchantment", "optimizeFadeTimers") === false) return;
+    if (game._documentsReady) {
+        console.warn("Playlist Enchantment | Fade scheduler must be registered during init; keeping the current class");
+        return;
+    }
     const Base = CONFIG.PlaylistSound.documentClass;
     if (Base._playlistEnchantmentScheduler) return;
     // Preserve another module's custom fade scheduler if it has replaced core's.

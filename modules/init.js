@@ -43,10 +43,13 @@ Hooks.once("init", () => {
 
     CONFIG.ui.playlists = EnchantedPlaylist
     installPickerOverride()
+
+    // Foundry creates world documents before setup. Both configured classes
+    // must be final in init so collection instanceof checks keep accepting them.
+    installAudioScheduler()
+    installPlaybackLifecycle()
 })
 
 Hooks.once("setup", () => {
-    installAudioScheduler()
-    installPlaybackLifecycle()
     setupHooks()
 })

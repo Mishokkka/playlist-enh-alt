@@ -2,7 +2,7 @@
 
 # Playlist Enchantment
 
-> **Local v1.3.11 Foundry VTT 13.351 patch.** The latest PR review, reproduced defects and validation limits are documented in [PR_REVIEW.md](PR_REVIEW.md). See `REVIEW.md` for the preceding review and `PERFORMANCE_AUDIT.md` for the performance investigation.
+> **Local v1.3.12 Foundry VTT 13.351 patch.** This fixes the document registration failure that broke existing playlist controls in 1.3.11. **Fully reload every client.** See [BOOTSTRAP_FIX.md](BOOTSTRAP_FIX.md) for the cause and verification; earlier review results are preserved in `PR_REVIEW.md` and `REVIEW.md`.
 
 Some minor tweaks to enhance the playlist experience. Drag playlists to the hotbar and enjoy some additional playlist controls. Read more on the github project page.
 This is a module for Foundry VTT.

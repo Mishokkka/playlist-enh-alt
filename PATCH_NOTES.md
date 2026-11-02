@@ -1,3 +1,13 @@
+# Playlist Enchantment 1.3.12 — critical document registration fix
+
+2026-11-03. Fixes the startup failure that made existing playlists reject every update with `You may only push instances of Playlist to the Playlists collection`.
+
+- Register Playlist and PlaylistSound subclasses during `init`, before Foundry constructs world documents. `setup` only registers runtime hooks and no longer changes document classes.
+- Refuse late installer calls once world documents are ready, preserving their collection type contract.
+- Add six startup regressions using the installed native DocumentCollection and complete client database backend, including its private update handler. The 1.3.11 build fails all six; 1.3.12 passes all six. The full seven-suite run passes 112 checks.
+
+The previous tests used an unchecked Map for world documents and missed this blocking defect. A full client reload is required; replacing files does not change classes already instantiated in memory. Details: `BOOTSTRAP_FIX.md`.
+
 # Playlist Enchantment 1.3.11 — PR #1 review
 
 2026-11-02. Target: Foundry VTT 13.351. See `PR_REVIEW.md` for the independent verification of the PR comments, additional defects, evidence and limitations.

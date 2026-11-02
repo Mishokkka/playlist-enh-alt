@@ -459,10 +459,13 @@ test("module entry point registers v13 controls and preserves the selected S3 bu
         await import("../bundle/modules/init.js");
         once.get("init")();
         assert.equal(CONFIG.ui.playlists, EnchantedPlaylist);
-        assert.equal(CONFIG.PlaylistSound.documentClass, NativePlaylistSound);
-        once.get("setup")();
         assert.equal(CONFIG.PlaylistSound.documentClass._playlistEnchantmentScheduler, true);
         assert.equal(CONFIG.Playlist.documentClass._playlistEnchantmentTransitions, true);
+        const playlistClass = CONFIG.Playlist.documentClass;
+        const soundClass = CONFIG.PlaylistSound.documentClass;
+        once.get("setup")();
+        assert.equal(CONFIG.Playlist.documentClass, playlistClass);
+        assert.equal(CONFIG.PlaylistSound.documentClass, soundClass);
         assert.ok(registered.has("settings"));
         assert.ok(registered.has("soundUploadFolder"));
         let options;

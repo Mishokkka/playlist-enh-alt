@@ -78,6 +78,10 @@ function prune(sound) {
 }
 
 export function installPlaybackLifecycle() {
+    if (game._documentsReady) {
+        console.warn("Playlist Enchantment | Document classes must be registered during init; keeping the current classes");
+        return;
+    }
     const Playlist = CONFIG.Playlist.documentClass;
     const PlaylistSound = CONFIG.PlaylistSound.documentClass;
     if (!Playlist._playlistEnchantmentTransitions) {
