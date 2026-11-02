@@ -18,11 +18,11 @@
         "uploadDone": "Alle Dateien wurden hochgeladen.",
 
         "CONTROL": {
-            "play": "Alle aktive Playlist Tracks starten (außer Soundboards)",
-            "stop": "Alle aktive Playlist Tracks stoppen (pausieren)",
-            "resume": "Alle aktive Playlist Tracks fortsetzen (außer Soundboards)",
-            "next": "Alle aktive Playlist Tracks zum nächsten Track springen (außer Soundboards)",
-            "previous": "Alle aktive Playlist Tracks zum vorherigen Track springen (außer Soundboards)",
+            "play": "Alle aktiven Playlist-Tracks starten (außer Soundboards)",
+            "stop": "Alle aktiven Playlist-Tracks stoppen (pausieren)",
+            "resume": "Alle aktiven Playlist-Tracks fortsetzen (außer Soundboards)",
+            "next": "Alle aktiven Playlist-Tracks zum nächsten Track springen lassen (außer Soundboards)",
+            "previous": "Alle aktiven Playlist-Tracks zum vorherigen Track springen lassen (außer Soundboards)",
             "togglePlaylistLoop": "Aktiviere/deaktiviere Loop für gesamte Playlist (außer Soundboards)"
         },
         "SoundLoopOff": "Loop ausschalten",

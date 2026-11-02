@@ -1,3 +1,17 @@
+# Playlist Enchantment 1.3.11 — PR #1 review
+
+2026-11-02. Target: Foundry VTT 13.351. See `PR_REVIEW.md` for the independent verification of the PR comments, additional defects, evidence and limitations.
+
+- Preserve concurrently playing playlists when using Next/Previous All and when a track naturally advances. Explicit selection still applies channel-aware exclusive Fade.
+- Re-evaluate affected channels inside the playlist operation queue, so a delayed stop cannot stop a newly started layer on another channel.
+- Handle a pause offset of exactly zero consistently in live queries, resume, sidebar context, stop fades and preservation of other channels.
+- Defer cancellation of a late audio start until core has assigned its operation promise, including loads completed after Stop or document deletion.
+- Replace quadratic matching of transition entries with maps and ignore malformed optional entries without aborting native updates.
+- Defer hidden popup refreshes until visibility returns; release the visibility listener during close.
+- Correct German control tooltip grammar. Retain the existing public playback APIs, transient fades and optimized audio clocks.
+
+Validation: 106 checks across six suites. Of the 14 new PR scenarios, 13 reproduce defects in the saved 1.3.10 PR head and one protects ordinary exclusive selection. Game FPS, real audio output, client networking and the full addon combination remain unmeasured.
+
 # Playlist Enchantment 1.3.10 — follow-up correctness review
 
 2026-11-02. Target: Foundry VTT 13.351. The 1.3.9 implementation had reproducible regressions; its passing tests did not establish full playback integration correctness. See `REVIEW.md`.

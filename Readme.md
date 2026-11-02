@@ -2,7 +2,7 @@
 
 # Playlist Enchantment
 
-> **Local v1.3.10 Foundry VTT 13.351 patch.** The follow-up review and its reproduced regressions are documented in `REVIEW.md`. See `PATCH_NOTES.md` and the Russian `PERFORMANCE_AUDIT.md` for the performance work and rollback instructions.
+> **Local v1.3.11 Foundry VTT 13.351 patch.** The latest PR review, reproduced defects and validation limits are documented in [PR_REVIEW.md](PR_REVIEW.md). See `REVIEW.md` for the preceding review and `PERFORMANCE_AUDIT.md` for the performance investigation.
 
 Some minor tweaks to enhance the playlist experience. Drag playlists to the hotbar and enjoy some additional playlist controls. Read more on the github project page.
 This is a module for Foundry VTT.
@@ -17,7 +17,7 @@ This local build is installed in the module folder. Reload every Foundry client 
 * Tracks can have a default fade in time. It will overwrite any existing fade time on playlists. Drag the slider next to 'Fade' to set the fade duration and enable the functionality by checking the corresponding checkbox.
 * New buttons to pause/start/forward/rewind all currently played tracks in the playlist directory.
 * Double click on a song in a playlist starts to play the sound
-* Drag playlists to the hotbar to create a play playlist macro. The macro will stop all other playlists and crossfade to the selected playlist. Moreover it'll show some quick buttons to handle playlists better
+* Drag playlists to the hotbar to create a playlist macro. It crossfades other playlists on the same audio channel while retaining other channels and soundboards. Grouped Next/Previous and automatic next-track playback preserve intentionally concurrent playlists.
 * Sounds have an option in their context menu for the gamemaster to be played without the players hearing the sound.
 * Drag a playlist folder to the hotbar to create a macro which starts a random playlist from the folder on each click.
 * Long song names loop in a marquee to be readable entirely

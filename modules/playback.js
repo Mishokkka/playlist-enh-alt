@@ -4,10 +4,15 @@ export function playbackSounds() {
     for (const playlist of game.playlists) {
         if (playlist.visible === false) continue;
         for (const sound of playlist.sounds) {
-            if ((sound.playing || sound.pausedTime) && (sound.isOwner || sound.playing)) sounds.push(sound);
+            if ((sound.playing || hasPausedTime(sound)) && (sound.isOwner || sound.playing)) sounds.push(sound);
         }
     }
     return sounds;
+}
+
+/** A stored pause offset can be zero; null/undefined mean there is no pause. */
+export function hasPausedTime(sound) {
+    return Number.isFinite(sound.pausedTime) && sound.pausedTime >= 0;
 }
 
 export function audioChannel(playlist, sound) {
@@ -43,13 +48,16 @@ export function timestamp(seconds) {
 /** Prepare only active tracks, including sources which have not finished loading. */
 export function playbackContext(sound) {
     const { volumeToInput, volumeToPercentage } = foundry.audio.AudioHelper;
-    const { id, uuid, name, playing, repeat, isOwner, pausedTime } = sound;
+    const { id, uuid, name, playing, repeat, isOwner } = sound;
     const volume = normalizeVolume(sound.volume);
     return {
         id, uuid, name, playing, repeat, isOwner,
         playlistId: sound.parent.id,
         css: playing ? "playing" : "",
-        play: { icon: `fa-solid ${playing ? "fa-square" : pausedTime ? "fa-play-circle" : "fa-play"}` },
+        play: {
+            icon: `fa-solid ${playing ? "fa-square" : hasPausedTime(sound) ? "fa-play-circle" : "fa-play"}`,
+            label: hasPausedTime(sound) ? "PLAYLIST.SoundResume" : "PLAYLIST.SoundPlay",
+        },
         pause: {
             disabled: !isOwner || !playing || !sound.sound?.loaded || sound.sound?.failed,
             icon: `fa-solid ${playing && !sound.sound?.loaded ? "fa-spinner fa-spin" : "fa-pause"}`,

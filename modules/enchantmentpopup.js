@@ -31,6 +31,9 @@ export class EnchantmentPopup extends foundry.applications.api.HandlebarsApplica
     this._closing = false;
     this._closePromise = null;
     this._playbackRows = null;
+    this._onVisibilityChange = () => {
+      if (!document.hidden && this._syncRequested && !this._closing) this.scheduleSync();
+    };
   }
 
   _getStateKey(sounds = playbackSounds()) {
@@ -114,7 +117,12 @@ export class EnchantmentPopup extends foundry.applications.api.HandlebarsApplica
 
   /** Coalesce document hooks and sidebar renders without building a render queue. */
   scheduleSync() {
-    if (this._closing || this._syncTimer !== null) return;
+    if (this._closing) return;
+    if (document.hidden) {
+      this._syncRequested = true;
+      return;
+    }
+    if (this._syncTimer !== null) return;
     this._syncTimer = setTimeout(() => {
       this._syncTimer = null;
       void this.syncFromPlaylistDirectory().catch((error) =>
@@ -125,10 +133,15 @@ export class EnchantmentPopup extends foundry.applications.api.HandlebarsApplica
 
   async syncFromPlaylistDirectory() {
     if (this._closing) return;
+    if (document.hidden) {
+      this._syncRequested = true;
+      return;
+    }
     if (this._syncInFlight || !this.rendered || !this.element) {
       this._syncRequested = true;
       return;
     }
+    this._syncRequested = false;
     if (this._getStateKey() === this._lastStateKey) {
       this.updateTimestamps();
       return;
@@ -147,6 +160,7 @@ export class EnchantmentPopup extends foundry.applications.api.HandlebarsApplica
   }
 
   _startTimestampUpdates() {
+    document.addEventListener?.("visibilitychange", this._onVisibilityChange);
     if (this._timestampTimer !== null) clearInterval(this._timestampTimer);
     this.updateTimestamps();
     this._timestampTimer = setInterval(() => this.updateTimestamps(), 1000);
@@ -180,6 +194,7 @@ export class EnchantmentPopup extends foundry.applications.api.HandlebarsApplica
     if (this._timestampTimer !== null) clearInterval(this._timestampTimer);
     this._timestampTimer = null;
     this._playbackRows = null;
+    document.removeEventListener?.("visibilitychange", this._onVisibilityChange);
     this._closePromise = Promise.resolve().then(() => super.close(options)).finally(() => {
       if (ui.enchantmentPopup === this) ui.enchantmentPopup = null;
     });

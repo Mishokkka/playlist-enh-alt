@@ -1,4 +1,4 @@
-import { PlaybackRows, playbackSounds, audioChannel, normalizeVolume, fadeDuration } from "./playback.js";
+import { PlaybackRows, playbackSounds, playbackContext, hasPausedTime, audioChannel, normalizeVolume, fadeDuration } from "./playback.js";
 import { FileLocation } from "./filelocation.js";
 import { withPlaybackOptions } from "./playback-lifecycle.js";
 
@@ -66,6 +66,19 @@ export class EnchantedPlaylist extends PlaylistDirectory {
     _preparePlaylistContext(root, playlist) {
         const context = super._preparePlaylistContext(root, playlist);
         context.playing = playlist.playing;
+        // Core tests pausedTime for truthiness and omits an offset of exactly 0.
+        // Keep those rows in both the directory and its currently-playing part.
+        let included;
+        for (const entry of context.sounds) {
+            const sound = playlist.sounds.get(entry.id);
+            if (sound?.playing || sound?.pausedTime !== 0) continue;
+            Object.assign(entry, playbackContext(sound));
+            included ??= new Set(this._playing.sounds);
+            if (included.has(sound)) continue;
+            included.add(sound);
+            this._playing.sounds.push(sound);
+            this._playing.context.push(entry);
+        }
         return context;
     }
 
@@ -227,11 +240,17 @@ export class EnchantedPlaylist extends PlaylistDirectory {
     }
 
     static async _stopChannels(playlist, channels, duration) {
-        const targets = playlist.sounds.filter((sound) => sound.playing && channels.has(audioChannel(playlist, sound)));
-        if (!targets.length) return;
-        const mixed = playlist.sounds.some((sound) => (sound.playing || sound.pausedTime)
-            && !channels.has(audioChannel(playlist, sound)));
-        return withPlaybackOptions(playlist, { duration, ids: new Set(targets.map((sound) => sound.id)) }, async () => {
+        const selectedChannels = new Set(channels);
+        const ids = new Set();
+        return withPlaybackOptions(playlist, { duration, ids }, async () => {
+            // Earlier queued commands can start or move layers. Decide from the
+            // live documents only after the playlist's preceding operation ends.
+            const targets = playlist.sounds.filter((sound) => sound.playing
+                && selectedChannels.has(audioChannel(playlist, sound)));
+            if (!targets.length) return;
+            const mixed = playlist.sounds.some((sound) => (sound.playing || hasPausedTime(sound))
+                && !selectedChannels.has(audioChannel(playlist, sound)));
+            for (const sound of targets) ids.add(sound.id);
             // Keep module wrappers responsible for cleanup, looping and replication.
             if (!mixed) return playlist.stopAll();
             for (const sound of targets) await playlist.stopSound(sound);
@@ -315,8 +334,9 @@ export class EnchantedPlaylist extends PlaylistDirectory {
     static async _enchantAllSkip(ev, target) {
         await EnchantedPlaylist._finishPendingCrossFade();
         const action = target.dataset.action;
+        const direction = action === "enchPlaylistForward" ? 1 : -1;
         return Promise.all(game.playlists.playing.filter((playlist) => playlist.isOwner && playlist.mode >= 0)
-            .map((playlist) => playlist.playNext(null, { direction: action === "enchPlaylistForward" ? 1 : -1 })));
+            .map((playlist) => withPlaybackOptions(playlist, {}, () => playlist.playNext(null, { direction }))));
     }
 
     static async _loopPlaylists(ev, target) {
